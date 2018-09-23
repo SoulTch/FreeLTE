@@ -3,6 +3,8 @@
 
 #include <pcap.h>
 #include <thread>
+#include <arpa/inet.h>
+#include <memory.h>
 #include <unistd.h>
 
 extern pcap_t *handle;

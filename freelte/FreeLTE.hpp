@@ -3,7 +3,6 @@
 
 
 #include <stdint.h>
-#include <i386/endian.h>
 #include <arpa/inet.h>
 #include <netinet/if_ether.h>
 #include <netinet/ip.h>
