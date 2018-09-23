@@ -1,7 +1,9 @@
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+SRC_FILES := $(wildcard *.cpp)
+OBJ_FILES := $(patsubst %.cpp, %.o, $(SRC_FILES))
 
 CPPFLAGS := -std=c++14
+
+all: OBJ_FILES
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
    g++ $(CPPFLAGS) -c -o $@ $<
