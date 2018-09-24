@@ -26,7 +26,7 @@ bool open_and_init(char *inf, uint32_t *serverIP, uint8_t *serverMac, uint8_t *g
 			*(uint8_t *)(pkt + 23) == 0x01 &&
 			*(uint32_t *)(pkt + 30) == 0x08080808) {
 				
-			memcpy(serverIP, pkt + 26, sizeof(*serverIP));
+			*serverIP = ntohl(*(uint32_t *)(pkt + 26));
 			memcpy(serverMac, pkt + 6, 6);
 			memcpy(gatewayMac, pkt, 6);
 
