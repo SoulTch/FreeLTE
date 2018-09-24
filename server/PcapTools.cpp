@@ -8,7 +8,7 @@ bool open_and_init(char *inf, uint32_t *serverIP, uint8_t *serverMac, uint8_t *g
 
 	std::thread pingthread([&]() {
 		for (int i = 0; i < 10; i++) {
-			usleep(500000);
+			usleep(200000);
 			system("ping -c 1 8.8.8.8 > dummy.o");
 		}
 		return;
@@ -19,7 +19,7 @@ bool open_and_init(char *inf, uint32_t *serverIP, uint8_t *serverMac, uint8_t *g
 
 	uint32_t start = time(NULL);
 
-	while(load(&hdr, &pkt) && time(NULL) - start <= 5) {
+	while(load(&hdr, &pkt) && time(NULL) - start <= 2) {
 		if (
 			*(uint16_t *)(pkt + 12) == htons(0x0800) && 
 			*(uint8_t *)(pkt + 14) == 0x45 && 
@@ -35,6 +35,7 @@ bool open_and_init(char *inf, uint32_t *serverIP, uint8_t *serverMac, uint8_t *g
 		}
 	}
 
+	pingthread.join();
 	return false;
 }
 
