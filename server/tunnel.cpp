@@ -1,11 +1,4 @@
 #include "tunnel.hpp"
-#include "squeue.hpp"
-#include "../freelte/PcapTools.hpp"
-
-#include <shared_mutex>
-#include <unordered_map>
-#include <memory.h>
-#include <queue>
 
 
 #define BUFFER_SIZE 100
@@ -17,7 +10,7 @@ uint8_t dmac[6];
 
 Squeue<std::pair<const uint8_t *, int> > q;
 std::queue<uint16_t> prq;
-std::unordered_map<std::pair<uint32_t, uint16_t>, std::pair<uint16_t, std::chrono::system_clock::time_point> > smap;
+std::map<std::pair<uint32_t, uint16_t>, std::pair<uint16_t, std::chrono::system_clock::time_point> > smap;
 std::pair<uint32_t, uint16_t> pmap[70000];
 boost::shared_mutex mtx;
 

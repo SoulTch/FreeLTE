@@ -3,7 +3,7 @@ OBJ_FILES := $(patsubst %.cpp, %.o, $(SRC_FILES))
 
 CPPFLAGS := -std=c++14
 
-all: OBJ_FILES
+all: $(OBJ_FILES)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-   g++ $(CPPFLAGS) -c -o $@ $<
+%.o: %.cpp
+	g++ $(CPPFLAGS) -c -o $@ $<
