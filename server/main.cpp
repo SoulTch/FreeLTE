@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-uing32_t my_ip;
+uint32_t my_ip;
 uint8_t my_mac[6];
 uint8_t gw_mac[6];
 
@@ -17,7 +17,10 @@ int main(int argc, char *argv[]) {
 
     open_and_init(argv[1], &my_ip, my_mac, gw_mac);
 
-    estabilsh(my_ip, my_mac, gw_mac);
+    printf("IP Address : %s\n", inet_ntoa(my_ip));
+    printf("MAC Address : %s\n", ether_ntoa(my_mac));
+    printf("GTW Address : %s\n", ether_ntoa(gw_mac));
 
+    establish(my_ip, my_mac, gw_mac);
     pause();
 }

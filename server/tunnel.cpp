@@ -10,6 +10,7 @@ uint8_t dmac[6];
 
 Squeue<std::pair<const uint8_t *, int> > q;
 std::queue<uint16_t> prq;
+bool enabled[70000];
 std::map<std::pair<uint32_t, uint16_t>, std::pair<uint16_t, std::chrono::system_clock::time_point> > smap;
 std::pair<uint32_t, uint16_t> pmap[70000];
 boost::shared_mutex mtx;
@@ -128,7 +129,7 @@ void handler() {
                     }
                 }
             }
-        } else if (REVERSE_PORT_START <= prt && prt <= REVERSE_PORT_END) {
+        } else if (enabled[prt]) {
             std::pair<uint32_t, uint16_t> addr = get_addr(prt);
             hdr_ip->ip_dst.s_addr = htonl(addr.first);
             hdr_tcp->th_dport = htons(addr.second);
@@ -170,16 +171,45 @@ void handler() {
     }
 }
 
+bool allocate(uint16_t prt) {
+    int sock = socket(PF_INET, SOCK_STREAM, 0);
+    if (sock < 0) return false;
+
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(prt);
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        return false;
+    }
+
+    return true;
+}
+
 bool establish(uint32_t _ip, uint8_t *_smac, uint8_t *_dmac) {
-    mip = htonl(_ip);
+    mip = _ip;
     memcpy(smac, _smac, 6);
     memcpy(dmac, _dmac, 6);
 
+    if (!allocate(FORWARD_PORT)) {
+        fprintf(stderr, "Cannot bind Forward port... %d\n", FORWARD_PORT);
+        exit(0);
+    }
+
+    int cnt = 0;
+    for (int i = REVERSE_PORT_START; i <= REVERSE_PORT_END; i++) {
+        if (allocate(i)) {
+            enabled[i] = true;
+            prq.push(i);
+            cnt++;
+        }
+    }
+
     std::thread t(tunneling);
 
-    for (int i = REVERSE_PORT_START; i <= REVERSE_PORT_END; i++) {
-        prq.push(i);
-    }
 
     for (int i = 0; i < THREAD_COUNT; i++) {
         std::thread s(handler);
@@ -187,5 +217,7 @@ bool establish(uint32_t _ip, uint8_t *_smac, uint8_t *_dmac) {
 
     std::thread(tunneling).detach();
     std::thread(handler).detach();
+
+    printf("Server estabilshed with %d ports\n", cnt);
     return true;
 }
